@@ -5,6 +5,8 @@ import java.awt.image.RenderedImage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Reto1 {
 
@@ -15,7 +17,7 @@ public class Reto1 {
             try {
                 serverSocket = new ServerSocket(40000);
             } catch (IOException e) {
-                System.err.println("No se pudó escuchar el puerto: " + getPort());
+                System.err.println("No se pudo escuchar el puerto: " + getPort());
                 System.exit(1);
             }
             Socket clienteSocket = null;
@@ -35,16 +37,33 @@ public class Reto1 {
             file = "/";
             while ((inputLine = in.readLine()) != null) {
                 if (inputLine.contains("GET")) {
-                    String resource = inputLine.split(" ")[1];
-                    System.out.println("InputLine:" + resource);
-                }
-                if (!in.ready()) {
+                    file  = inputLine.substring(inputLine.indexOf("/")+1,inputLine.indexOf(" ", inputLine.indexOf(" ")+1));
+
                     break;
                 }
+                 if (!in.ready()) {
+                    break;
+                }
+               
             }
-            throw new IOException("No es posible obtener la URL");
 
+        String [] tipoArchivo = getResource(file);
+        
+        if(tipoArchivo[1]=="html" || tipoArchivo[1]=="js"){
+            getArchivo(tipoArchivo[0],out);
         }
+        else if(tipoArchivo[1]=="img"){
+            getImagen(tipoArchivo[0],clienteSocket.getOutputStream());
+        }
+       /* else{
+            getNotFound(clienteSocket.getOutputStream());
+        }*/
+        out.close();
+        in.close();
+        clienteSocket.close();
+        serverSocket.close();
+        }
+        
     }
 
     static int getPort() {
@@ -53,45 +72,73 @@ public class Reto1 {
         }
         return 40000;
     }
+    
 
-    public static void getResources(String path, OutputStream outputStream) throws IOException {
-        if (path.equals("/paisaje.html")) {
-            getPaisaje(outputStream);
-        }  else {
-            notFound(outputStream);
+    public static String[] getResource(String archivo){
+    String ruta = "src/main/resources/";
+    String[] ans = new String[2];
+        if (archivo.endsWith(".html")){
+            ruta+="html/"+archivo;
+            ans[1]="html";
+        }
+        else if(archivo.endsWith(".img") || archivo.endsWith(".jpeg") || archivo.endsWith(".png") || archivo.endsWith(".gif")){
+            ruta+="img/"+archivo;
+            ans[1]="img";
+        }
+        else if(archivo.endsWith(".js")){
+            ruta+="js/"+archivo;
+            ans[1]="js";
+        }
+        ans[0]=ruta;
+        return ans;
+    }
+    
+    public static void getImagen(String tipo, OutputStream clienteOutput) throws IOException {
+        try {
+            BufferedImage image = ImageIO.read(new File(tipo));
+            ByteArrayOutputStream ArrBytes = new ByteArrayOutputStream();
+            DataOutputStream writeImg = new DataOutputStream(clienteOutput);
+            ImageIO.write(image, "PNG", ArrBytes);
+            writeImg.writeBytes("HTTP/1.1 200 OK \r\n" + "Content-Type: image/png \r\n");
+            writeImg.write(ArrBytes.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public static void getPaisaje(OutputStream outputStream){
-        PrintWriter resp = new PrintWriter(outputStream,true);
-        resp.println("HTTP/1.1 200 OK");
-        inicializar(resp);
-        resp.println("<title>Paisaje Colombiano</title>\r\n");
-        resp.println("</head>\r\n");
-        resp.println("<body>\r\n");
-        resp.println("\"Pagina dedicada a los paisajes colombianos\"");
-        resp.println("</body>\r\n");
-        resp.println("</html>\r\n");
-        resp.flush();
-        resp.close();
+    private static void getArchivo(String ruta, PrintWriter out) throws IOException {
+        File archivo = new File(ruta);
+        String text = "";
+        String temp = "";
+        if (archivo.exists()) {
+            try {
+                BufferedReader t = new BufferedReader(new FileReader(archivo));
+                while ((temp = t.readLine()) != null) {
+                    System.out.println(temp);
+                    text += temp;
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            out.println(text);
+
+        }
     }
 
-    private static void notFound(OutputStream outputStream) {
-        PrintWriter resp = new PrintWriter(outputStream, true);
-        resp.println("HTTP/1.1 404 Not Found");
-        inicializar(resp);
-        resp.println("<title>Not FOUND</title>\r\n");
-        resp.flush();
-        resp.close();
+    private static void getNotFound(OutputStream outputStream) {
+        try {
+            ByteArrayOutputStream ArrBytes = new ByteArrayOutputStream();
+            DataOutputStream writenF = new DataOutputStream(outputStream);
+            writenF.writeBytes("HTTP/1.1 404 NOT FOUND \r\n");
+        } catch (IOException ex) {
+            Logger.getLogger(Reto1.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    private static void inicializar(PrintWriter resp){
-        resp.print("\"Content-Type: text/html\\r\\n\"");
-        resp.println("<!DOCTYPE html>\r\n");
-        resp.println("<html lang=\"en\">\r\n");
-        resp.println("<head>\r\n");
-        resp.println("<meta charset=\"UTF-8\">\r\n");
-
+    
 }
 
 
@@ -99,4 +146,4 @@ public class Reto1 {
 
 
 
-}
+

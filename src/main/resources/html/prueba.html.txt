@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+	<title>
+		PaisajeColombiano
+	</title>
+
+	<body>
+	<p> Pagina dedicada a paisajes colombianos <\p>
+	</body>
+	
+</html>
