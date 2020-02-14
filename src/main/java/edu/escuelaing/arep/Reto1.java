@@ -98,8 +98,8 @@ public class Reto1 {
             BufferedImage image = ImageIO.read(new File(tipo));
             ByteArrayOutputStream ArrBytes = new ByteArrayOutputStream();
             DataOutputStream writeImg = new DataOutputStream(clienteOutput);
-            ImageIO.write(image, "PNG", ArrBytes);
-            writeImg.writeBytes("HTTP/1.1 200 OK \r\n" + "Content-Type: image/png \r\n");
+            ImageIO.write(image, "JPG", ArrBytes);
+            writeImg.writeBytes("HTTP/1.1 200 OK \r\n" + "Content-Type: image/jpg \r\n");
             writeImg.write(ArrBytes.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
@@ -117,8 +117,6 @@ public class Reto1 {
                     System.out.println(temp);
                     text += temp;
                 }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
 
             } catch (IOException e) {
                 e.printStackTrace();
