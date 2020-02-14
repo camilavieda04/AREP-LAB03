@@ -55,9 +55,6 @@ public class Reto1 {
         else if(tipoArchivo[1]=="img"){
             getImagen(tipoArchivo[0],clienteSocket.getOutputStream());
         }
-       /* else{
-            getNotFound(clienteSocket.getOutputStream());
-        }*/
         out.close();
         in.close();
         clienteSocket.close();
