@@ -17,6 +17,9 @@ Para ejecutar este programa es necesario tener en cuenta los siguientes pasos:
 
 Sarah Camila Vieda Castro
 
+## Despliegue 
+[![CircleCI](https://circleci.com/gh/camilavieda04/AREP-LAB03.svg?style=svg)](https://circleci.com/gh/camilavieda04/AREP-LAB03)
+
 ## License 
 
 This project is licensed under the GNU General Public License v3.0 - see the LICENSE.md file for details.
