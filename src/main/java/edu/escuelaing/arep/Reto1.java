@@ -1,12 +1,13 @@
 package edu.escuelaing.arep;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.awt.Desktop;
+import java.nio.file.Path;
 
 public class Reto1 {
 
@@ -33,34 +34,40 @@ public class Reto1 {
                             clienteSocket.getInputStream()
                     )
             );
-            String inputLine, file;
-            file = "/";
+            String inputLine, outpuLine;
+            //file = "/";
             while ((inputLine = in.readLine()) != null) {
                 if (inputLine.contains("GET")) {
-                    file  = inputLine.substring(inputLine.indexOf("/")+1,inputLine.indexOf(" ", inputLine.indexOf(" ")+1));
-
-                    break;
+                    String[] url1=inputLine.split("/");
+                    String[] url2=inputLine.split(" ");
+                    //file  = inputLine.substring(inputLine.indexOf("/")+1,inputLine.indexOf(" ", inputLine.indexOf(" ")+1));
+                    //break;}
+                    System.out.println(url2[0]);
+                    if(url2[0].contains("JPG")|| url2[0].contains("jpg")){
+                        getImagen("src/main/resources/img/"+url2[0],clienteSocket.getOutputStream(),out);
+                    }
+                    if(url2[0].contains("html")){
+                        getArchivoHTML("src/main/resource/html/"+url2[0],clienteSocket.getOutputStream());
+                    }
+                    if(url2[0].contains("js")){
+                        getArchivoJS("src/main/resource/js/"+url2[0],clienteSocket.getOutputStream());
+                    }
+                    else{
+                        getNotFound(clienteSocket.getOutputStream());
+                    
                 }
                  if (!in.ready()) {
                     break;
                 }
                
             }
-
-        String [] tipoArchivo = getResource(file);
-        
-        if(tipoArchivo[1]=="html" || tipoArchivo[1]=="js"){
-            getArchivo(tipoArchivo[0],out);
-        }
-        else if(tipoArchivo[1]=="img"){
-            getImagen(tipoArchivo[0],clienteSocket.getOutputStream());
-        }
         out.close();
         in.close();
         clienteSocket.close();
         serverSocket.close();
         }
         
+    }
     }
 
     static int getPort() {
@@ -70,57 +77,66 @@ public class Reto1 {
         return 40000;
     }
     
-
-    public static String[] getResource(String archivo){
-    String ruta = "src/main/resources/";
-    String[] ans = new String[2];
-        if (archivo.endsWith(".html")){
-            ruta+="html/"+archivo;
-            ans[1]="html";
-        }
-        else if(archivo.endsWith(".img") || archivo.endsWith(".jpeg") || archivo.endsWith(".png") || archivo.endsWith(".gif")){
-            ruta+="img/"+archivo;
-            ans[1]="img";
-        }
-        else if(archivo.endsWith(".js")){
-            ruta+="js/"+archivo;
-            ans[1]="js";
-        }
-        ans[0]=ruta;
-        return ans;
-    }
     
-    public static void getImagen(String tipo, OutputStream clienteOutput) throws IOException {
+    public static void getImagen(String tipo, OutputStream clienteOutput,PrintWriter out) throws IOException {
         try {
-            BufferedImage image = ImageIO.read(new File(tipo));
+            BufferedImage image = ImageIO.read(new File(System.getProperty("user.dir")+tipo));
             ByteArrayOutputStream ArrBytes = new ByteArrayOutputStream();
             DataOutputStream writeImg = new DataOutputStream(clienteOutput);
+            String img = "HTTP /1.1 404 NOT FOUND \r\n"
+                    + "Content-Type: text/html; charset=\"UTF-8\" \r\n"
+                    + "\r\n";
             ImageIO.write(image, "JPG", ArrBytes);
             writeImg.writeBytes("HTTP/1.1 200 OK \r\n" + "Content-Type: image/jpg \r\n");
             writeImg.write(ArrBytes.toByteArray());
+            System.out.println(System.getProperty("user.dir")+tipo);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("r"+e.getMessage());
         }
     }
 
-    private static void getArchivo(String ruta, PrintWriter out) throws IOException {
-        File archivo = new File(ruta);
-        String text = "";
-        String temp = "";
-        if (archivo.exists()) {
-            try {
-                BufferedReader t = new BufferedReader(new FileReader(archivo));
-                while ((temp = t.readLine()) != null) {
-                    System.out.println(temp);
-                    text += temp;
+    private static void getArchivoHTML(String ruta, OutputStream outputStream) throws IOException {
+        /*
+        String temp = "";*/
+        try {
+             String text = "";
+             String temp;
+             BufferedReader t = new BufferedReader(new FileReader(System.getProperty("user.dir")+ruta));
+             while ((temp = t.readLine()) != null) {
+                    //System.out.println(temp);
+                    text= text+temp;
                 }
-
+             outputStream.write(("HTTP/1.1 404 NOT FOUND  \r\n"
+                    + "Content-Type: text/html; charset=\"UTF-8\" \r\n"
+                    + "\r\n"
+                    + text).getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            out.println(text);
-
-        }
+          
+        
+    }
+    
+     private static void getArchivoJS(String ruta, OutputStream outputStream) throws IOException {
+        /*
+        String temp = "";*/
+        try {
+             String text = "";
+             String temp;
+             BufferedReader t = new BufferedReader(new FileReader(System.getProperty("user.dir")+ruta));
+             while ((temp = t.readLine()) != null) {
+                    //System.out.println(temp);
+                    text= text+temp;
+                }
+              outputStream.write(("HTTP/1.1 404 NOT FOUND  \r\n"
+                    + "Content-Type: text/html; charset=\"UTF-8\" \r\n"
+                    + "\r\n"
+                    + text).getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+          
+        
     }
 
     private static void getNotFound(OutputStream outputStream) {
