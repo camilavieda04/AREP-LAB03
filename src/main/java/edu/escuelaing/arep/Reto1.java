@@ -56,19 +56,20 @@ public class Reto1 {
                         getNotFound(clienteSocket.getOutputStream());
 
                     }
-                    if (!in.ready()) {
-                        break;
-                    }
-
                 }
-                out.close();
-                in.close();
-                clienteSocket.close();
-                serverSocket.close();
+                if (!in.ready()) {
+                        break;
+                }
+
+            }
+            out.close();
+            in.close();
+            clienteSocket.close();
+            serverSocket.close();    
             }
 
         }
-    }
+    
 
     static int getPort() {
         if (System.getenv("PORT") != null) {
