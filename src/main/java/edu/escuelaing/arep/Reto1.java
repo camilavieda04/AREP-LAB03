@@ -86,8 +86,10 @@ public class Reto1 {
             String img = "HTTP /1.1 404 NOT FOUND \r\n"
                     + "Content-Type: text/html; charset=\"UTF-8\" \r\n"
                     + "\r\n";
-            ImageIO.write(image, "JPG", ArrBytes);
-            writeImg.writeBytes("HTTP/1.1 200 OK \r\n" + "Content-Type: image/jpg \r\n");
+            ImageIO.write(image, "PNG", ArrBytes);
+            writeImg.writeBytes("HTTP/1.1 200 OK \r\n");
+            writeImg.writeBytes("Content-Type: image/png \r\n");
+            writeImg.writeBytes("\r\n");
             writeImg.write(ArrBytes.toByteArray());
             System.out.println(System.getProperty("user.dir") + tipo);
         } catch (IOException e) {
