@@ -48,13 +48,10 @@ public class Reto1 {
                         getImagen("/src/main/resources/img/" + url2[0], clienteSocket.getOutputStream(), out);
                     }
                     if (url2[0].contains("html")) {
-                        getArchivoHTML("/src/main/resource/html/" + url2[0], clienteSocket.getOutputStream());
+                        getArchivoHTML("/src/main/resources/html/" + url2[0], clienteSocket.getOutputStream());
                     }
                     if (url2[0].contains("js")) {
-                        getArchivoJS("/src/main/resource/js/" + url2[0], clienteSocket.getOutputStream());
-                    } else {
-                        getNotFound(clienteSocket.getOutputStream());
-
+                        getArchivoJS("/src/main/resources/js/" + url2[0], clienteSocket.getOutputStream());
                     }
                 }
                 if (!in.ready()) {
@@ -108,12 +105,13 @@ public class Reto1 {
                 //System.out.println(temp);
                 text = text + temp;
             }
-            outputStream.write(("HTTP/1.1 404 NOT FOUND  \r\n"
-                    + "Content-Type: text/html; charset=\"UTF-8\" \r\n"
+            outputStream.write(("HTTP/1.1 201 Found  \r\n"
+                    + "Content-Type: text/html; charset=\"utf-8\" \r\n"
                     + "\r\n"
                     + text).getBytes());
         } catch (IOException e) {
-            e.printStackTrace();
+            //System.out.println("entre pero no hice nada");
+            //e.printStackTrace();
         }
 
     }
@@ -129,8 +127,8 @@ public class Reto1 {
                 //System.out.println(temp);
                 text = text + temp;
             }
-            outputStream.write(("HTTP/1.1 404 NOT FOUND  \r\n"
-                    + "Content-Type: text/html; charset=\"UTF-8\" \r\n"
+            outputStream.write(("HTTP/1.1 201 FOUND  \r\n"
+                    + "Content-Type: application/json; charset=\"UTF-8\" \r\n"
                     + "\r\n"
                     + text).getBytes());
         } catch (IOException e) {
@@ -139,14 +137,14 @@ public class Reto1 {
 
     }
 
-    private static void getNotFound(OutputStream outputStream) {
+    /*private static void getNotFound(OutputStream outputStream) {
         try {
             ByteArrayOutputStream ArrBytes = new ByteArrayOutputStream();
             DataOutputStream writenF = new DataOutputStream(outputStream);
-            writenF.writeBytes("HTTP/1.1 404 NOT FOUND \r\n");
+            writenF.writeBytes("HTTP/1.1 200 FOUND \r\n");
         } catch (IOException ex) {
             Logger.getLogger(Reto1.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
 
 }
